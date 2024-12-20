@@ -10,7 +10,12 @@ namespace Data
 	public class PriceRecord
 	{
 		public int Id { get; set; }
+
+		public string Symbol { get; set; }
+
 		public DateTime DateAndTime { get; set; }
+		public TimeFrame Frame { get; set; }
+
 
 		[Column(TypeName = "decimal(16,8)")]
 		public decimal Open { get; set; }
@@ -23,7 +28,17 @@ namespace Data
 
 		[Column(TypeName = "decimal(16,8)")]
 		public decimal Close { get; set; }
-		public TimeFrame Frame { get; set; }
+
+		public bool IsSamePrice(PriceRecord that)
+		{
+			var sameSymbol = string.Equals(Symbol, that.Symbol, StringComparison.InvariantCultureIgnoreCase);
+
+			var sameTimeFrame = Frame == that.Frame;
+
+			var sameDateTime = DateAndTime == that.DateAndTime;
+
+			return sameSymbol && sameTimeFrame && sameDateTime;
+		}
 
 		public enum TimeFrame
 		{
