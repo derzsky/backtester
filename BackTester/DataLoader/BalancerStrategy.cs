@@ -1,14 +1,9 @@
 ﻿using Data;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataProcessor
 {
-	public class BalancerStrategy
+	public class BalancerStrategy : IStrategy
 	{
 		private PriceRecord _latestMainPrice;
 		public decimal BtcTargetShare { get; set; } = .5m;

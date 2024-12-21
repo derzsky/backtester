@@ -6,7 +6,7 @@ namespace DataProcessor
 	{
 		static async Task Main(string[] args)
 		{
-			var strategy = new BalancerStrategy();
+			IStrategy strategy = new BalancerStrategy();
 
 			var dataContext = new DatContext();
 			var prices = dataContext.Prices
