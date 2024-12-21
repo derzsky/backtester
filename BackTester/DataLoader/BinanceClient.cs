@@ -1,14 +1,6 @@
 ﻿using Binance.Net.Clients;
 using Binance.Net.Enums;
-using Binance.Net.Interfaces;
-using Binance.Net.Objects.Models.Spot;
-using CryptoExchange.Net.CommonObjects;
 using Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataProcessor
 {
