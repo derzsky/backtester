@@ -2,7 +2,7 @@
 
 namespace DataProcessor
 {
-	public class PriceWorker
+	public class PriceDbWorker
 	{
 		public async Task UpdateAllPRices(string quote)
 		{
