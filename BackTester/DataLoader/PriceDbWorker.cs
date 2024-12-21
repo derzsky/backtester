@@ -4,7 +4,7 @@ namespace DataProcessor
 {
 	public class PriceDbWorker
 	{
-		public async Task UpdateAllPRices(string quote)
+		public async Task UpdateAllPRices(string quote, PriceRecord.TimeFrame timeFrame = PriceRecord.TimeFrame.Day1)
 		{
 			var dataContext = new DatContext();
 
@@ -13,11 +13,11 @@ namespace DataProcessor
 
 			foreach(var sym in symbols)
 			{
-				await UpdatePrices(sym, dataContext, client, PriceRecord.TimeFrame.Day1);
+				await UpdatePrices(sym, dataContext, client, timeFrame);
 			}
 		}
 
-		public async Task UpdatePrices(string symbol, PriceRecord.TimeFrame timeFrame = PriceRecord.TimeFrame.Day1)
+		public async Task UpdatePrices(string symbol, PriceRecord.TimeFrame timeFrame)
 		{
 			var dataContext = new DatContext();
 			var client = new BinanceClient();

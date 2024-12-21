@@ -10,8 +10,9 @@ namespace DataProcessor
 {
 	public class BalancerStrategy
 	{
+		private PriceRecord _latestMainPrice;
 		public decimal BtcTargetShare { get; set; } = .5m;
-		public decimal BtcShareMaxDiviation { get; set; } = .1m;
+		public decimal BtcShareMaxDiviation { get; set; } = .05m;
 
 		[Column(TypeName = "decimal(16,8)")]
 		public decimal Usdt { get; private set; } = 1000;
@@ -19,16 +20,35 @@ namespace DataProcessor
 		[Column(TypeName = "decimal(16,8)")]
 		public decimal Btc { get; private set; } = 0;
 
-		public decimal GetPortfolioTotal(PriceRecord btcPrice)
+		public decimal PortfolioTotal
 		{
-			var btcValue = Btc * btcPrice.Open;
-			var portfolioValue = btcValue + Usdt;
+			get
+			{
+				if (_latestMainPrice == null)
+					return 0;
 
-			return portfolioValue;
+				var btcValue = Btc * _latestMainPrice.Open;
+				var portfolioValue = btcValue + Usdt;
+
+				return portfolioValue;
+			}
+		}
+
+		public void RunFull(List<PriceRecord> prices)
+		{
+			var btcPrices = prices.Where(p => p.Symbol == "BTCUSDT")
+									.OrderBy(p => p.DateAndTime).ToList();
+
+			foreach (var pric in btcPrices)
+			{
+				PlayIteration(pric);
+			}
 		}
 
 		public void PlayIteration(PriceRecord price)
 		{
+			_latestMainPrice = price;
+
 			var btcCurrentShare = GetBtcCurrentShare(price);
 			var btcCurrentShareDeviation = btcCurrentShare - BtcTargetShare;
 			if (Math.Abs(btcCurrentShareDeviation) < BtcShareMaxDiviation)
@@ -53,7 +73,7 @@ namespace DataProcessor
 		private decimal GetBtcCurrentShare(PriceRecord btcPrice)
 		{
 			var btcValue = Btc * btcPrice.Open;
-			var total = GetPortfolioTotal(btcPrice);
+			var total = PortfolioTotal;
 			var btcCurrentShare = btcValue / total;
 
 			return btcCurrentShare;
@@ -61,7 +81,7 @@ namespace DataProcessor
 
 		private void Buy(PriceRecord price, decimal portfolioShareToBuy)
 		{
-			var portfolioUsdtValue = GetPortfolioTotal(price);
+			var portfolioUsdtValue = PortfolioTotal;
 			var usdtNeeded = portfolioUsdtValue * -portfolioShareToBuy;
 
 			Usdt -= usdtNeeded;
@@ -70,7 +90,7 @@ namespace DataProcessor
 
 		private void Sell(PriceRecord price, decimal portfolioShareToSell)
 		{
-			var portfolioUsdtValue = GetPortfolioTotal(price);
+			var portfolioUsdtValue = PortfolioTotal;
 			var usdtNeeded = portfolioUsdtValue * portfolioShareToSell;
 			var btcNeeded = usdtNeeded / price.Open;
 

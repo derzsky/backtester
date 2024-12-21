@@ -7,14 +7,17 @@ namespace DataProcessor
 		static async Task Main(string[] args)
 		{
 			var strategy = new BalancerStrategy();
-			var runner = new StrategyRunner(strategy);
 
 			var dataContext = new DatContext();
 			var prices = dataContext.Prices
-				.Where(p => p.Symbol == "BTCUSDT"
-				&& p.Frame == PriceRecord.TimeFrame.Day1).ToList();
+				.Where(p => p.Frame == PriceRecord.TimeFrame.Day1).ToList();
 
-			runner.Run(prices);
+			strategy.RunFull(prices);
+
+			var portfolio = strategy.DemonstratePortfolio();
+			var total = strategy.PortfolioTotal;
+
+			Console.WriteLine($"{portfolio}, Total: {total.ToString(GeneralConstants.UsdtFormat)}");
 
 			Console.WriteLine("Hello, World!");
 		}
