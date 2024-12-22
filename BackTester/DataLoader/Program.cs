@@ -21,13 +21,16 @@ namespace DataProcessor
 			var total = strategy.PortfolioTotal;
 
 			Console.WriteLine($"{portfolio}, Total: {total.ToString(GeneralConstants.UsdtFormat)}");
-
-			Console.WriteLine("Hello, World!");
 		}
 
 		private static void DemonstrateTrade(object sender, TradeEventArgs eventArgs)
 		{
-			Console.WriteLine($"{eventArgs.DaTime.Date.ToShortDateString()}, {eventArgs.Direction}, {eventArgs.Qty.ToString("##0.####")} BTC for {eventArgs.Price.ToString("#####0.##")} UDST each, Total: {eventArgs.Amount.ToString("#####0.##")} USDT");
+			string date = eventArgs.DaTime.Date.ToShortDateString();
+			string btcQty = eventArgs.Qty.ToString("##0.####");
+			string btcPrice = eventArgs.Price.ToString("#####0.");
+			string total = eventArgs.Amount.ToString("#####0.");
+
+			Console.WriteLine($"{date} {eventArgs.Direction} {btcQty} BTC for {btcPrice} USDT each, Total: {total} USDT");
 		}
 	}
 }
