@@ -2,7 +2,7 @@
 
 using Data;
 
-namespace DataProcessor
+namespace Strategies
 {
 	public interface IStrategy
 	{
@@ -10,5 +10,7 @@ namespace DataProcessor
 
 		public string DemonstratePortfolio();
 		public void RunFull(List<PriceRecord> prices);
+
+		//уведомлять когда произошла сделка
 	}
 }

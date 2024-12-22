@@ -1,7 +1,7 @@
 ﻿using Data;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DataProcessor
+namespace Strategies
 {
 	public class BalancerStrategy : IStrategy
 	{
