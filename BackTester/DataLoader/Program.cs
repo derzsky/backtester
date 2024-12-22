@@ -13,6 +13,8 @@ namespace DataProcessor
 			var prices = dataContext.Prices
 				.Where(p => p.Frame == PriceRecord.TimeFrame.Day1).ToList();
 
+			strategy.OnTrade += DemonstrateTrade;
+
 			strategy.RunFull(prices);
 
 			var portfolio = strategy.DemonstratePortfolio();
@@ -21,6 +23,11 @@ namespace DataProcessor
 			Console.WriteLine($"{portfolio}, Total: {total.ToString(GeneralConstants.UsdtFormat)}");
 
 			Console.WriteLine("Hello, World!");
+		}
+
+		private static void DemonstrateTrade(object sender, TradeEventArgs eventArgs)
+		{
+			Console.WriteLine($"{eventArgs.DaTime.Date.ToShortDateString()}, {eventArgs.Direction}, {eventArgs.Qty.ToString("##0.####")} BTC for {eventArgs.Price.ToString("#####0.##")} UDST each, Total: {eventArgs.Amount.ToString("#####0.##")} USDT");
 		}
 	}
 }

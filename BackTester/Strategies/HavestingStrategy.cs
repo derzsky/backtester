@@ -6,6 +6,8 @@ namespace Strategies
 	{
 		public decimal PortfolioTotal => throw new NotImplementedException();
 
+		public event TradeDelegate OnTrade;
+
 		public string DemonstratePortfolio()
 		{
 			throw new NotImplementedException();

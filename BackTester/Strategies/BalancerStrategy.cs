@@ -6,6 +6,9 @@ namespace Strategies
 	public class BalancerStrategy : IStrategy
 	{
 		private PriceRecord _latestMainPrice;
+
+		public event TradeDelegate OnTrade;
+
 		public decimal BtcTargetShare { get; set; } = .5m;
 		public decimal BtcShareMaxDiviation { get; set; } = .05m;
 
@@ -78,9 +81,12 @@ namespace Strategies
 		{
 			var portfolioUsdtValue = PortfolioTotal;
 			var usdtNeeded = portfolioUsdtValue * -portfolioShareToBuy;
+			var qty = usdtNeeded / price.Open;
 
 			Usdt -= usdtNeeded;
-			Btc += usdtNeeded / price.Open;
+			Btc += qty;
+
+			RaiseOnTrade(TradeDirection.Buy, qty, price.DateAndTime, price.Open, price.Symbol);
 		}
 
 		private void Sell(PriceRecord price, decimal portfolioShareToSell)
@@ -91,6 +97,22 @@ namespace Strategies
 
 			Usdt += usdtNeeded;
 			Btc -= btcNeeded;
+
+			RaiseOnTrade(TradeDirection.Sell, btcNeeded, price.DateAndTime, price.Open, price.Symbol);
+		}
+
+		private void RaiseOnTrade(TradeDirection direction, decimal qty, DateTime daTime, decimal priceValue, string symbol)
+		{
+			var eventArgs = new TradeEventArgs
+			{
+				DaTime = daTime,
+				Direction = direction,
+				Price = priceValue,
+				Qty = qty,
+				Symbol = symbol
+			};
+
+			OnTrade?.Invoke(this, eventArgs);
 		}
 	}
 }
