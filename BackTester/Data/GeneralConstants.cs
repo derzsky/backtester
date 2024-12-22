@@ -10,5 +10,6 @@ namespace Data
 	{
 		public const string UsdtFormat = "#######0.";
 		public const string BtcFormat = "#0.####";
+		public const string Usdt = "USDT";
 	}
 }

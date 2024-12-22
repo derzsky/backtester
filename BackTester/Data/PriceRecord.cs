@@ -11,7 +11,6 @@ namespace Data
 		public DateTime DateAndTime { get; set; }
 		public TimeFrame Frame { get; set; }
 
-
 		[Column(TypeName = "decimal(16,8)")]
 		public decimal Open { get; set; }
 
