@@ -2,7 +2,7 @@
 
 namespace Strategies
 {
-	public class BuyOnce : IStrategy
+	public class BuyOnceAndHold : IStrategy
 	{
 		private string[] _stableCoins = { "USDC", "BUSD", "FDUSD", "TUSD", "PAX", "USDD", "USDS", "HUSD", "DAI", "USDP", "EURI" };
 
@@ -36,7 +36,7 @@ namespace Strategies
 
 		public event TradeDelegate OnTrade;
 
-		public BuyOnce()
+		public BuyOnceAndHold()
 		{
 			_portfolio.Add(GeneralConstants.Usdt, 10_000);
 		}

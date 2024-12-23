@@ -7,7 +7,7 @@ namespace DataProcessor
 	{
 		static async Task Main(string[] args)
 		{
-			var strategy = new BuyOnce();
+			var strategy = new BuyOnceAndHold();
 			RunStrategy(strategy);
 		}
 
