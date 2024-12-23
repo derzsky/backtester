@@ -7,7 +7,7 @@ namespace DataProcessor
 	{
 		static async Task Main(string[] args)
 		{
-			var strategy = new BuyOnceAndHold();
+			var strategy = new BuyWhenLowPrice();
 			RunStrategy(strategy);
 		}
 
@@ -21,7 +21,9 @@ namespace DataProcessor
 		{
 			var dataContext = new DatContext();
 			var prices = dataContext.Prices
-				.Where(p => p.Frame == PriceRecord.TimeFrame.Week1).ToList();
+				.Where(p => p.Frame == PriceRecord.TimeFrame.Week1
+						&& p.Symbol.IndexOf("DOWN") == -1
+						&& p.Symbol.IndexOf("UPUSDT") == -1).ToList();
 
 			strategy.OnTrade += DemonstrateTrade;
 
@@ -37,7 +39,7 @@ namespace DataProcessor
 		{
 			string date = eventArgs.DaTime.Date.ToShortDateString();
 			string btcQty = eventArgs.Qty.ToString("##0.####");
-			string coinPrice = eventArgs.Price.ToString("#####0.");
+			string coinPrice = eventArgs.Price.ToString("#####0.########");
 			string total = eventArgs.Amount.ToString("#####0.");
 
 			Console.WriteLine($"{date} {eventArgs.Direction} {btcQty} {eventArgs.Symbol} {coinPrice} each, Total: {total} USDT");

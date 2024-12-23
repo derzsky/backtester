@@ -30,15 +30,19 @@ namespace Strategies
 					total += position.Value * positinoPrice.Close;
 				}
 
+				total += Usdt;
+
 				return total;
 			}
 		}
+
+		public decimal Usdt { get { return _portfolio[GeneralConstants.USDT]; } }
 
 		public event TradeDelegate OnTrade;
 
 		public BuyOnceAndHold()
 		{
-			_portfolio.Add(GeneralConstants.Usdt, 10_000);
+			_portfolio.Add(GeneralConstants.USDT, 10_000);
 		}
 
 		public string DemonstratePortfolio()
@@ -48,7 +52,7 @@ namespace Strategies
 
 		public void RunFull(List<PriceRecord> prices)
 		{
-			var stablecoinsPairs = _stableCoins.Select(s => $"{s}{GeneralConstants.Usdt}").ToList();
+			var stablecoinsPairs = _stableCoins.Select(s => $"{s}{GeneralConstants.USDT}").ToList();
 
 			var relevantPrices = prices.Where(p => p.DateAndTime == StartDate
 			&& !stablecoinsPairs.Contains(p.Symbol)).ToList();
@@ -65,7 +69,7 @@ namespace Strategies
 		{
 			var symbols = relevantPrices.Select(p => p.Symbol).Distinct().ToList();
 
-			var volumeForEachPosition = _portfolio[GeneralConstants.Usdt] / symbols.Count;
+			var volumeForEachPosition = _portfolio[GeneralConstants.USDT] / symbols.Count;
 
 			foreach (var sym in symbols)
 			{
@@ -86,7 +90,7 @@ namespace Strategies
 			if (!_portfolio.ContainsKey(sym))
 				_portfolio.Add(sym, 0);
 
-			_portfolio[GeneralConstants.Usdt] -= amountToBuy * price.Close;
+			_portfolio[GeneralConstants.USDT] -= amountToBuy * price.Close;
 			_portfolio[sym] += amountToBuy;
 		}
 
