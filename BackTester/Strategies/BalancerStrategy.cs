@@ -10,10 +10,10 @@ namespace Strategies
 		public event TradeDelegate OnTrade;
 
 		public decimal BtcTargetShare { get; set; } = .5m;
-		public decimal BtcShareMaxDeviation { get; set; } = .20m;
+		public decimal BtcShareMaxDeviation { get; set; } = .49m;
 
 		[Column(TypeName = "decimal(16,8)")]
-		public decimal Usdt { get; private set; } = 1000;
+		public decimal Usdt { get; private set; } = 10_000;
 
 		[Column(TypeName = "decimal(16,8)")]
 		public decimal Btc { get; private set; } = 0;
@@ -26,15 +26,15 @@ namespace Strategies
 					return 0;
 
 				var btcValue = Btc * _latestMainPrice.Open;
-				var portfolioValue = btcValue + Usdt;
 
-				return portfolioValue;
+				return btcValue;
 			}
 		}
 
 		public void RunFull(List<PriceRecord> prices)
 		{
-			var btcPrices = prices.Where(p => p.Symbol == "BTCUSDT")
+			var btcPrices = prices.Where(p => p.Symbol == "BTCUSDT"
+								&& p.DateAndTime > new DateTime(2021, 5, 3))
 									.OrderBy(p => p.DateAndTime).ToList();
 
 			foreach (var pric in btcPrices)
@@ -71,7 +71,7 @@ namespace Strategies
 		private decimal GetBtcCurrentShare(PriceRecord btcPrice)
 		{
 			var btcValue = Btc * btcPrice.Open;
-			var total = PortfolioCoinsTotal;
+			var total = PortfolioCoinsTotal + Usdt;
 			var btcCurrentShare = btcValue / total;
 
 			return btcCurrentShare;
@@ -79,7 +79,7 @@ namespace Strategies
 
 		private void Buy(PriceRecord price, decimal portfolioShareToBuy)
 		{
-			var portfolioUsdtValue = PortfolioCoinsTotal;
+			var portfolioUsdtValue = PortfolioCoinsTotal + Usdt;
 			var usdtNeeded = portfolioUsdtValue * -portfolioShareToBuy;
 			var qty = usdtNeeded / price.Open;
 
@@ -91,7 +91,7 @@ namespace Strategies
 
 		private void Sell(PriceRecord price, decimal portfolioShareToSell)
 		{
-			var portfolioUsdtValue = PortfolioCoinsTotal;
+			var portfolioUsdtValue = PortfolioCoinsTotal + Usdt;
 			var usdtNeeded = portfolioUsdtValue * portfolioShareToSell;
 			var btcNeeded = usdtNeeded / price.Open;
 
