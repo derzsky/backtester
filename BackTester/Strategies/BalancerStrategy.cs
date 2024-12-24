@@ -10,7 +10,7 @@ namespace Strategies
 		public event TradeDelegate OnTrade;
 
 		public decimal BtcTargetShare { get; set; } = .5m;
-		public decimal BtcShareMaxDiviation { get; set; } = .05m;
+		public decimal BtcShareMaxDeviation { get; set; } = .20m;
 
 		[Column(TypeName = "decimal(16,8)")]
 		public decimal Usdt { get; private set; } = 1000;
@@ -49,7 +49,7 @@ namespace Strategies
 
 			var btcCurrentShare = GetBtcCurrentShare(price);
 			var btcCurrentShareDeviation = btcCurrentShare - BtcTargetShare;
-			if (Math.Abs(btcCurrentShareDeviation) < BtcShareMaxDiviation)
+			if (Math.Abs(btcCurrentShareDeviation) < BtcShareMaxDeviation)
 				return;
 
 			if (btcCurrentShareDeviation <= 0)
