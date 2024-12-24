@@ -18,7 +18,7 @@ namespace Strategies
 		[Column(TypeName = "decimal(16,8)")]
 		public decimal Btc { get; private set; } = 0;
 
-		public decimal PortfolioTotal
+		public decimal PortfolioCoinsTotal
 		{
 			get
 			{
@@ -71,7 +71,7 @@ namespace Strategies
 		private decimal GetBtcCurrentShare(PriceRecord btcPrice)
 		{
 			var btcValue = Btc * btcPrice.Open;
-			var total = PortfolioTotal;
+			var total = PortfolioCoinsTotal;
 			var btcCurrentShare = btcValue / total;
 
 			return btcCurrentShare;
@@ -79,7 +79,7 @@ namespace Strategies
 
 		private void Buy(PriceRecord price, decimal portfolioShareToBuy)
 		{
-			var portfolioUsdtValue = PortfolioTotal;
+			var portfolioUsdtValue = PortfolioCoinsTotal;
 			var usdtNeeded = portfolioUsdtValue * -portfolioShareToBuy;
 			var qty = usdtNeeded / price.Open;
 
@@ -91,7 +91,7 @@ namespace Strategies
 
 		private void Sell(PriceRecord price, decimal portfolioShareToSell)
 		{
-			var portfolioUsdtValue = PortfolioTotal;
+			var portfolioUsdtValue = PortfolioCoinsTotal;
 			var usdtNeeded = portfolioUsdtValue * portfolioShareToSell;
 			var btcNeeded = usdtNeeded / price.Open;
 

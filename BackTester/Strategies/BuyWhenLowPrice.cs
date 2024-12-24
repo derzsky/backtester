@@ -11,10 +11,11 @@ namespace Strategies
 		private Dictionary<string, decimal> _portfolio = new();
 		private List<PriceRecord> _latestPrices = new();
 		private List<string> _delistedCoins = new();
+		private TimeSpan _acceptableTimeGap = TimeSpan.FromDays(440);
 
 		public DateTime StartDate = new DateTime(2021, 05, 03);
 
-		public decimal PortfolioTotal
+		public decimal PortfolioCoinsTotal
 		{
 			get
 			{
@@ -31,8 +32,6 @@ namespace Strategies
 
 					total += position.Value * positinoPrice.Close;
 				}
-
-				total += Usdt;
 
 				return total;
 			}
@@ -71,7 +70,7 @@ namespace Strategies
 
 		private void BuyOnLow(List<PriceRecord> relevantPrices, List<PriceRecord> prices)
 		{
-			var amountForEachPosition = _portfolio[GeneralConstants.USDT] / 94;
+			var amountForEachPosition = _portfolio[GeneralConstants.USDT] / 60;
 			
 
 			var dates = relevantPrices.Select(p => p.DateAndTime).Distinct().ToList();
@@ -92,9 +91,8 @@ namespace Strategies
 			var coveredLows = GetMinimalCoveredPrices(datePrices, prices);
 
 			//смотрим, чтобы он был давно
-			var acceptableTimeGap = TimeSpan.FromDays(200);
 			var oldEnoughLows = coveredLows
-									.Where(p => dat - p.DateAndTime >= acceptableTimeGap)
+									.Where(p => dat - p.DateAndTime >= _acceptableTimeGap)
 									.ToList();
 
 			//кандидат это современная цена, которая обновила достаточно старый лоу
@@ -150,9 +148,16 @@ namespace Strategies
 											&& p.DateAndTime < currentPrice.DateAndTime)
 										.ToList();
 
+				var latestNotCoveredPrice = olderPrices
+											.Where(op => op.Low < currentPrice.Low)
+											.MaxBy(op => op.DateAndTime);
+				DateTime? notCoveredDate = latestNotCoveredPrice?.DateAndTime;
+				if (notCoveredDate is null)
+					notCoveredDate = currentPrice.DateAndTime - _acceptableTimeGap;
+
 				var minimalCoveredPrice = olderPrices
 					.Where(p => p.Symbol == sym
-							&& p.DateAndTime < currentPrice.DateAndTime
+							&& p.DateAndTime > notCoveredDate
 							&& p.Low <= currentPrice.Open
 							&& p.Low >= currentPrice.Low)
 					.MinBy(p => p.Low);

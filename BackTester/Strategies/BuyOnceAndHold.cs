@@ -12,7 +12,7 @@ namespace Strategies
 
 		public DateTime StartDate = new DateTime(2021, 05, 03);
 
-		public decimal PortfolioTotal
+		public decimal PortfolioCoinsTotal
 		{
 			get
 			{
@@ -29,8 +29,6 @@ namespace Strategies
 
 					total += position.Value * positinoPrice.Close;
 				}
-
-				total += Usdt;
 
 				return total;
 			}

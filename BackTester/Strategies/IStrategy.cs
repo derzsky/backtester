@@ -6,7 +6,7 @@ namespace Strategies
 {
 	public interface IStrategy
 	{
-		public decimal PortfolioTotal { get; }
+		public decimal PortfolioCoinsTotal { get; }
 		public decimal Usdt { get; }
 
 		public string DemonstratePortfolio();

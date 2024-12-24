@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using Binance.Net.Objects.Models.Futures;
+using Data;
 using Strategies;
 
 namespace DataProcessor
@@ -30,9 +31,11 @@ namespace DataProcessor
 			strategy.RunFull(prices);
 
 			var portfolio = strategy.DemonstratePortfolio();
-			var total = strategy.PortfolioTotal;
+			var coinsTotal = strategy.PortfolioCoinsTotal;
+			var usdt = strategy.Usdt;
+			var total = coinsTotal + strategy.Usdt;
 
-			Console.WriteLine($"{portfolio}, Total: {total.ToString(GeneralConstants.UsdtFormat)}");
+			Console.WriteLine($"{portfolio}, USDT: {usdt.ToString(GeneralConstants.UsdtFormat)}, Coins: {coinsTotal.ToString(GeneralConstants.UsdtFormat)} USDT, Total: {(total).ToString(GeneralConstants.UsdtFormat)}");
 		}
 
 		private static void DemonstrateTrade(object sender, TradeEventArgs eventArgs)
