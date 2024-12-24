@@ -8,11 +8,12 @@ namespace DataProcessor
 	{
 		static async Task Main(string[] args)
 		{
-			var strategy = new BuyWhenLowPrice();
+			var strategy = new BuyLowSellDouble();
 			RunStrategy(strategy);
+			//await UpdatePricesFromExchangeAsync();
 		}
 
-		private async Task UpdatePricesFromExchange()
+		private static async Task UpdatePricesFromExchangeAsync()
 		{
 			var priceWorker = new PriceDbWorker();
 			await priceWorker.UpdateAllPRices("USDT", PriceRecord.TimeFrame.Week1);
@@ -44,8 +45,9 @@ namespace DataProcessor
 			string btcQty = eventArgs.Qty.ToString("##0.####");
 			string coinPrice = eventArgs.Price.ToString("#####0.########");
 			string total = eventArgs.Amount.ToString("#####0.");
+			string usdt = eventArgs.USDT.ToString("#####0.");
 
-			Console.WriteLine($"{date} {eventArgs.Direction} {btcQty} {eventArgs.Symbol} {coinPrice} each, Total: {total} USDT");
+			Console.WriteLine($"{date} {eventArgs.Direction} {btcQty} {eventArgs.Symbol} {coinPrice} each, USDT: {usdt}, Total: event {total} USDT");
 		}
 	}
 }
