@@ -18,7 +18,8 @@ namespace DataProcessor
 
 			var dataSymbols = callResult.Data.Symbols;
 
-			var exchangeSymbolsFiltered = dataSymbols.Where(ds => ds.QuoteAsset == quoteSymbol).ToList();
+			var exchangeSymbolsFiltered = dataSymbols.Where(ds => ds.QuoteAsset == quoteSymbol
+																&& ds.Status == SymbolStatus.Trading).ToList();
 
 			result = exchangeSymbolsFiltered.Select(esf => esf.Name).ToList();
 
