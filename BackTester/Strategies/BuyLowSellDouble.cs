@@ -1,6 +1,7 @@
 ﻿using Data;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata;
 
 namespace Strategies
 {
@@ -13,7 +14,7 @@ namespace Strategies
 		private List<string> _delistedCoins = new();
 		private TimeSpan _acceptableTimeGap = TimeSpan.FromDays(440);
 
-		public DateTime StartDate = new DateTime(2021, 05, 03);
+		public DateTime StartDate = new DateTime(2022, 05, 03);
 
 		public decimal PortfolioCoinsTotal
 		{
@@ -70,18 +71,19 @@ namespace Strategies
 
 		private void BuyOnLow(List<PriceRecord> relevantPrices, List<PriceRecord> prices)
 		{
-			var amountForEachPosition = _portfolio[GeneralConstants.USDT] / 60;
-			
+			var amountForEachPosition = _portfolio[GeneralConstants.USDT] / 20;
+
 
 			var dates = relevantPrices.Select(p => p.DateAndTime).Distinct().ToList();
 			foreach (var dat in dates)
 			{
 				var datePrices = relevantPrices.Where(p => p.DateAndTime == dat).ToList();
 
-				HandleBuys(dat, datePrices, prices, amountForEachPosition);
+				HandleSells(dat, datePrices, amountForEachPosition);
 
-				if (Usdt < amountForEachPosition)
-					break;
+				if (Usdt >= amountForEachPosition)
+					HandleBuys(dat, datePrices, prices, amountForEachPosition);
+
 			}
 		}
 
@@ -112,6 +114,24 @@ namespace Strategies
 			RaiseOnTrade(TradeDirection.Buy, qty, priceToBuy.DateAndTime, priceToBuy.Close, priceToBuy.Symbol);
 		}
 
+		private void HandleSells(DateTime dat, List<PriceRecord> datePrices, decimal amountForEachPosition)
+		{
+			foreach (var pric in datePrices)
+			{
+				if (!_portfolio.ContainsKey(pric.Symbol))
+					continue;
+
+				var positionValue = _portfolio[pric.Symbol] * pric.High;
+				if (positionValue < amountForEachPosition * 3)
+					continue;
+
+				var qty = _portfolio[pric.Symbol];
+				var targetPrice = amountForEachPosition * 3 / qty;
+				Sell(pric.Symbol, qty, targetPrice);
+				RaiseOnTrade(TradeDirection.Sell, qty, pric.DateAndTime, targetPrice, pric.Symbol);
+			}
+		}
+
 		private void Buy(string sym, decimal amountToBuy, decimal PriceValue)
 		{
 			if (!_portfolio.ContainsKey(sym))
@@ -119,6 +139,21 @@ namespace Strategies
 
 			_portfolio[GeneralConstants.USDT] -= amountToBuy * PriceValue;
 			_portfolio[sym] += amountToBuy;
+		}
+
+		private void Sell(string symbol, decimal qty, decimal price)
+		{
+			if (!_portfolio.ContainsKey(symbol)
+				|| _portfolio[symbol] < qty)
+				return;
+
+			_portfolio[symbol] -= qty;
+			_portfolio[GeneralConstants.USDT] += qty * price;
+
+
+			var emptyPositions = _portfolio.Where(dic => dic.Value <= .000001m).ToList();
+			foreach (var position in emptyPositions)
+				_portfolio.Remove(position.Key);
 		}
 
 		private void RaiseOnTrade(TradeDirection direction, decimal qty, DateTime daTime, decimal priceValue, string symbol)
@@ -129,7 +164,8 @@ namespace Strategies
 				Direction = direction,
 				Price = priceValue,
 				Qty = qty,
-				Symbol = symbol
+				Symbol = symbol,
+				USDT = Usdt
 			};
 
 			OnTrade?.Invoke(this, eventArgs);
