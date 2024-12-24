@@ -25,6 +25,7 @@ namespace Strategies
 		public decimal Price { get; set; }
 		public decimal Qty { get; set; }
 		public string Symbol { get; set; }
+		public decimal USDT { get; set; }
 		public decimal Amount
 		{
 			get
